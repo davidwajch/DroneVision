@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DroneVision</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #121a2b;
+      --panel-2: #0f1626;
+      --accent: #3ea6ff;
+      --accent-2: #7cf7c8;
+      --text: #e6edf6;
+      --muted: #93a1b5;
+      --danger: #ff6b6b;
+      --border: #22304a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: radial-gradient(1200px 600px at 70% -10%, #15223c 0%, var(--bg) 55%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 22px 20px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(10, 16, 28, 0.6);
+    }
+    header .logo {
+      width: 42px; height: 42px;
+      display: grid; place-items: center;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      border-radius: 10px; font-size: 22px;
+    }
+    header h1 { margin: 0; font-size: 1.5rem; letter-spacing: 0.5px; }
+    header p { margin: 2px 0 0; color: var(--muted); font-size: 0.85rem; }
+    .wrap { max-width: 920px; margin: 0 auto; padding: 24px 16px 60px; }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+    .uploader {
+      border: 1.5px dashed var(--border);
+      border-radius: 12px;
+      padding: 26px;
+      text-align: center;
+      background: var(--panel-2);
+    }
+    input[type="file"] {
+      color: var(--muted);
+      margin: 10px 0 18px;
+    }
+    .btn {
+      appearance: none; border: none; cursor: pointer;
+      background: linear-gradient(135deg, var(--accent), #2b7fd6);
+      color: #04121f; font-weight: 700; font-size: 1rem;
+      padding: 12px 26px; border-radius: 10px;
+      transition: transform .08s ease, filter .15s ease;
+    }
+    .btn:hover { filter: brightness(1.08); }
+    .btn:active { transform: translateY(1px); }
+    .hint { color: var(--muted); font-size: 0.82rem; margin-top: 6px; }
+    .error {
+      border-left: 4px solid var(--danger);
+      background: rgba(255, 107, 107, 0.08);
+      color: #ffd3d3; padding: 14px 16px; border-radius: 8px;
+    }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+    .preview img { width: 100%; border-radius: 10px; border: 1px solid var(--border); }
+    h2 { font-size: 1.05rem; margin: 0 0 12px; color: var(--accent-2); }
+    .desc {
+      font-size: 1.15rem; line-height: 1.5;
+      background: var(--panel-2); border: 1px solid var(--border);
+      padding: 16px; border-radius: 10px;
+    }
+    .conf { color: var(--muted); font-size: 0.82rem; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip {
+      background: rgba(62, 166, 255, 0.12);
+      border: 1px solid rgba(62, 166, 255, 0.35);
+      color: #cfe7ff; padding: 6px 12px; border-radius: 999px; font-size: 0.85rem;
+    }
+    .chip b { color: #fff; }
+    .obj {
+      background: rgba(124, 247, 200, 0.10);
+      border: 1px solid rgba(124, 247, 200, 0.30);
+      color: #d7fff0;
+    }
+    .empty { color: var(--muted); font-style: italic; }
+    footer { text-align: center; color: var(--muted); font-size: 0.78rem; padding: 20px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">&#128760;</div>
+    <div>
+      <h1>DroneVision</h1>
+      <p>Analise de imagens de monitoramento aereo com Azure AI Vision</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="card">
+      <form class="uploader" action="/analyze" method="post" enctype="multipart/form-data">
+        <p>Envie uma imagem capturada pelo drone para analise</p>
+        <input type="file" name="image" accept="image/*" required />
+        <br />
+        <button class="btn" type="submit">Analisar imagem</button>
+        <div class="hint">Formatos aceitos: JPG, PNG, GIF, BMP &middot; tamanho maximo 4 MB</div>
+      </form>
+    </div>
+
+    {% if error %}
+    <div class="card">
+      <div class="error">{{ error }}</div>
+    </div>
+    {% endif %}
+
+    {% if description %}
+    <div class="card">
+      <div class="grid">
+        <div class="preview">
+          <h2>Imagem enviada</h2>
+          <img src="{{ preview }}" alt="Imagem analisada" />
+        </div>
+        <div>
+          <h2>Descricao gerada pela IA</h2>
+          <div class="desc">{{ description }}</div>
+          {% if description_conf is not none %}
+          <div class="conf">Confianca: {{ description_conf }}%</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Tags identificadas</h2>
+      {% if tags %}
+      <div class="chips">
+        {% for t in tags %}
+        <span class="chip"><b>{{ t.name }}</b> &middot; {{ t.confidence }}%</span>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="empty">Nenhuma tag identificada.</p>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <h2>Objetos detectados</h2>
+      {% if objects %}
+      <div class="chips">
+        {% for o in objects %}
+        <span class="chip obj"><b>{{ o.name }}</b> &middot; {{ o.confidence }}%</span>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="empty">Nenhum objeto detectado nesta imagem.</p>
+      {% endif %}
+    </div>
+    {% endif %}
+  </main>
+
+  <footer>
+    FIAP 5EMR &middot; GS 2o Semestre &middot; Cloud Computing &amp; MaaS &middot; RM93624 / RM565431
+  </footer>
+</body>
+</html>

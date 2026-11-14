@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+
+# Deploy
+app.zip
+
+# Credenciais locais (NUNCA versionar chaves do Azure)
+.env
+*.env
+
+# Sistema
+.DS_Store
+Thumbs.db
