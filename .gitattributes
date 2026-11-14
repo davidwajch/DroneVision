@@ -1,0 +1,3 @@
+# Garante que scripts shell usem sempre quebra de linha LF (Unix),
+# evitando erros de "\r" ao rodar no Azure Cloud Shell (Bash).
+*.sh text eol=lf
