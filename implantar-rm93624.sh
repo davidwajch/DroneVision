@@ -21,7 +21,7 @@ set -euo pipefail
 # ------------------------- Parametros -------------------------------------
 # Ajuste apenas o RM se quiser usar o do outro integrante (ex.: 565431).
 RM="93624"
-LOCATION="eastus2"
+LOCATION="brazilsouth"
 
 # Nomes seguindo o padrao de nomenclatura exigido na GS.
 RG="rg-dronevision-rm${RM}"
@@ -37,6 +37,10 @@ RUNTIME="PYTHON:3.11"
 
 echo "==> [1/8] Criando o Resource Group: ${RG}"
 az group create --name "${RG}" --location "${LOCATION}" --output table
+
+echo "==> Registrando os provedores necessarios (CognitiveServices e Web)"
+az provider register --namespace Microsoft.CognitiveServices --wait
+az provider register --namespace Microsoft.Web --wait
 
 echo "==> [2/8] Criando o recurso Azure AI Vision (Computer Vision): ${AIV}"
 az cognitiveservices account create \
