@@ -21,7 +21,7 @@ set -euo pipefail
 # ------------------------- Parametros -------------------------------------
 # Ajuste apenas o RM se quiser usar o do outro integrante (ex.: 565431).
 RM="93624"
-LOCATION="eastus"
+LOCATION="eastus2"
 
 # Nomes seguindo o padrao de nomenclatura exigido na GS.
 RG="rg-dronevision-rm${RM}"
